@@ -1,13 +1,9 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
 
 jobs:
 
-  print_hello:
+  save_hello_world_output:
     
     docker:
       - image: circleci/node:13.8.0
@@ -15,28 +11,37 @@ jobs:
     steps:
       - run:
           command: |
-              echo "hello"
+              echo "hello world" > ~/output.txt
 
-  print_world:
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - output.txt
+
+  print_output_file:
     
     docker:
       - image: circleci/node:13.8.0
     
     steps:
+
+      - attach_workspace:
+          at: ~/
+      
       - run:
           command: |
-              echo "world"
+              cat output.txt
 
 
-# Orchestrate or schedule a set of jobs
 workflows:
+  
   version: 2
-  # Name the workflow "welcome"
-  test_and_run:
-    # Run the welcome/run job in its own container
-      jobs:
-        - print_hello
 
-        - print_world:
-              requires:
-                  - print_hello
+  share_output_files:
+    
+      jobs:
+        - save_hello_world_output
+
+        - print_output_file:
+            requires:
+              - save_hello_world_output

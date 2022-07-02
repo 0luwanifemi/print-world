@@ -30,7 +30,7 @@ jobs:
       
       - run:
           command: |
-              cat output.txt
+              cat ~/output.txt
 
 
 workflows:
@@ -38,7 +38,7 @@ workflows:
   version: 2
 
   share_output_files:
-    
+
       jobs:
         - save_hello_world_output
 
